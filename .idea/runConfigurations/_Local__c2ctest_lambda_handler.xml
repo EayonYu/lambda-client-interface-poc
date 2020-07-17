@@ -1,0 +1,27 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="[Local] c2ctest.lambda_handler" type="aws.lambda" factoryName="Local" singleton="false" nameIsGenerated="true">
+    <option name="credentialProviderId" value="profile:default" />
+    <option name="regionId" value="ap-southeast-1" />
+    <option name="debugHost" value="localhost" />
+    <option name="environmentVariables">
+      <map />
+    </option>
+    <option name="handler" />
+    <option name="logicalFunctionName" />
+    <option name="memorySize" value="128" />
+    <option name="runtime" />
+    <option name="templateFile" value="$PROJECT_DIR$/c2ctest.py" />
+    <option name="timeout" value="500" />
+    <option name="useTemplate" value="true" />
+    <option name="input" value="{&#10;  &quot;event&quot;: &quot;&quot;,&#10;  &quot;context&quot;: &quot;&quot;&#10;}" />
+    <option name="inputIsFile" value="false" />
+    <sam>
+      <option name="additionalBuildArgs" value="" />
+      <option name="additionalLocalArgs" value="" />
+      <option name="buildInContainer" value="false" />
+      <option name="dockerNetwork" value="" />
+      <option name="skipImagePull" value="false" />
+    </sam>
+    <method v="2" />
+  </configuration>
+</component>

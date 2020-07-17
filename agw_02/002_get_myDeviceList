@@ -1,0 +1,50 @@
+# -*- coding: utf-8 -*-
+
+import requests
+import json
+from TCLconfigs.param_utils import Param, ParamUtils
+
+from responseUtil import Response, Code, ParamError, api_gateway_cors_response
+
+
+def lambda_handler(event, context):
+    try:
+
+        if not ParamUtils.all(event, context):
+            raise ParamError
+        param = Param(event)
+        print(param)
+
+        platform_user_id = param.authorizer.get("platformUserId")
+
+        print("platformUserId---->!!!:", platform_user_id)
+
+        url = "http://52.80.46.135:8080/user-device/devices/" + str(platform_user_id)
+        param = {
+            "platformUserId": platform_user_id
+        }
+
+        response = requests.get(url, params=param)
+        content = json.loads(response.text)
+        data = content.get("data")
+        print("data--->!!!", data)
+        response = Response(Code.SUCCESS, data)
+        print('\n'.join(['%s:%s' % item for item in response.__dict__.items()]))
+    except Exception as e:
+        raise e
+
+    # return  {
+    #     'statusCode': 200,
+    #     'headers': {
+    #         'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,,authorization,X-Api-Key,X-Amz-Security-Token',
+    #         'Access-Control-Allow-Origin': '*',
+    #         'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+    #     },
+    #     'body': json.dumps('Hello from Lambda!')
+    #     }
+    return api_gateway_cors_response(response)
+
+    # return {
+    #     'statusCode': 200,
+    #     'body': json.dumps('Hello from Lambda!')
+    # }
