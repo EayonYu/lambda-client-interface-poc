@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import json
 import time
+from time import time as now
 
 import boto3
 
@@ -39,7 +40,7 @@ def read_records(kinesis_stream):
 
 def lambda_handler(event, context):
     # the stream I defined in aws console
-    my_stream_name = 'debug4cli'
+    my_stream_name = 'prod-mirror-update'
 
     kinesis_client = boto3.client('kinesis', region_name='cn-north-1')
 
@@ -89,3 +90,8 @@ def lambda_handler(event, context):
 
 if __name__ == "__main__":
     lambda_handler("", "")
+    # from datetime import datetime
+    #
+    # dt = datetime.now()
+    # datenow = dt.strftime('%Y-%m-%d %H:%M:%S')  # 24小时制时间
+    # print(datenow)

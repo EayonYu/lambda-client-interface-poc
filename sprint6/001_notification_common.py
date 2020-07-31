@@ -15,6 +15,8 @@ from boto3 import client as boto3_client
 from responseUtil import Response, Code, ParamError, api_gateway_cors_response
 
 print('Notification Loading Function')
+kinesis_stream_name = os.environ.get('KINESIS_STREAM')
+kinesis_stream_name = 'debug4partner_batch'
 lambda_client = boto3_client('lambda')
 
 
@@ -39,15 +41,27 @@ def lambda_handler(event, context):
 
         if message_type == "DeviceDeleted.command":
             print("开始--->调用删除device的lambda")
-            for device_id in body_payload_list:
+            for userId in body_payload_list:
                 # 调用lambda 的data
                 item = {
-                    "deviceId": device_id
-                }
+                    "deviceId": userId
+                    }
                 item.update({
                     "partnerId": partner_id,
                     "messageType": message_type
-                })
+                    })
+                body_payload_list_new.append(item)
+        elif message_type == "UserDeleted.event":
+            print("开始--->调用删除device的lambda")
+            for userId in body_payload_list:
+                # 调用lambda 的data
+                item = {
+                    "userId": userId
+                    }
+                item.update({
+                    "partnerId": partner_id,
+                    "messageType": message_type
+                    })
                 body_payload_list_new.append(item)
         else:
             # DeviceInfoChanged.command………………
@@ -56,16 +70,16 @@ def lambda_handler(event, context):
                 device.update({
                     "partnerId": partner_id,
                     "messageType": message_type
-                })
+                    })
             body_payload_list_new = body_payload_list
 
         # 看下item有没有改变
         print('body_payload_list--->type: ', type(body_payload_list), body_payload_list)
         lambda_params = {
-            'stream_name': 'debug4partner_batch'
+            'stream_name': kinesis_stream_name
             , 'partition_key': 'china_iot'
             , 'records_to_kinesis': body_payload_list_new
-        }
+            }
 
         to_kinesis_data_list = json.dumps(lambda_params)
         print("to_kinesis_data_list--->: ", to_kinesis_data_list)
@@ -81,7 +95,7 @@ def lambda_handler(event, context):
         response_body = {
             "header": body_header,
             "payload": "SUCCESS"
-        }
+            }
 
         if payload_res.get('ResponseMetadata').get('HTTPStatusCode') == 200:
             # response = Response(Code.SUCCESS, response_body)
@@ -92,10 +106,10 @@ def lambda_handler(event, context):
                     'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,authorization,X-Api-Key,X-Amz-Security-Token',
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
-                },
+                    },
                 'body': json.dumps(response_body)
 
-            }
+                }
         # 组装返回值 end
 
     # dumps_payload = json.dumps(payload[0])
@@ -114,7 +128,7 @@ if __name__ == "__main__":
             "messageType": "DeviceInfoChanged.command",
             "partnerId": "china_iot",
             "messageId": "20da6c8e-bc2f-11ea-87ff-f40f241e6280"
-        },
+            },
         "payload": [
             {
                 "deviceId": "2030835",
@@ -129,29 +143,29 @@ if __name__ == "__main__":
                     "firmwareVersions": {
                         "wifiModule": "123",
                         "mcu": "777777777"
+                        }
                     }
                 }
-            }
-        ]
-    }
+            ]
+        }
     param_body_device_deleted = {
         "header": {
             "protocolVersion": "0.0.1",
             "messageType": "DeviceDeleted.command",
             "partnerId": "china_iot",
             "messageId": "20da6c8e-bc2f-11ea-87ff-f40f241e6280"
-        },
+            },
         "payload": [
-            "2030840", "2030835"
-        ]
-    }
+            "2030838", "2030839"
+            ]
+        }
     param_body_relationship = {
         "header": {
             "protocolVersion": "0.0.2",
             "messageType": "DeviceListChanged.command",
             "partnerId": "china_iot",
             "messageId": "20da6c8e-bc2f-11ea-87ff-f40f241e6280"
-        },
+            },
         "payload": [
             {
                 "deviceId": "2030835",
@@ -160,9 +174,9 @@ if __name__ == "__main__":
                 "owner": 0,
                 "privilege": 1
 
-            }
-        ]
-    }
+                }
+            ]
+        }
 
     param_body_device_property = {
         "header": {
@@ -170,32 +184,32 @@ if __name__ == "__main__":
             "messageType": "DevicePropertyChanged.command",
             "partnerId": "china_iot",
             "messageId": "20da6c8e-bc2f-11ea-87ff-f40f241e6280"
-        }
+            }
         , "payload": [
             {
                 "deviceId": "2030835",
                 "reachability": {
                     "value": "online444",
                     "updated_at": 1593672252675
-                },
+                    },
                 "properties": {
                     "2030835:temperature_controller.measured_temperature": {
                         "value": 24,
                         "updated_at": 1593672252675
-                    },
+                        },
                     "2030835:temperature_controller.mode": {
                         "value": "cold",
                         "updated_at": 1312312312
-                    },
+                        },
                     "2030835:temperature_controller.status": {
                         "value": "on",
                         "updated_at": 1312312999
+                        }
                     }
-                }
 
-            }
-        ]
-    }
+                }
+            ]
+        }
 
     param_body_device_property_v2 = {
         "header": {
@@ -203,7 +217,7 @@ if __name__ == "__main__":
             "messageType": "DevicePropertyChanged.command",
             "partnerId": "china_iot",
             "messageId": "20da6c8e-bc2f-11ea-87ff-f40f241e6280"
-        },
+            },
         "payload": [
             {
                 "deviceId": "2030835",
@@ -211,30 +225,30 @@ if __name__ == "__main__":
                     "measured_temperature": {
                         "value": 31,
                         "updated_at": 1593672252675
-                    },
+                        },
                     "mode": {
                         "value": "cold",
                         "updated_at": 1593672252677
-                    }
-                },
+                        }
+                    },
                 "wind_controller": {
                     "wind_speed": {
                         "value": "middle",
                         "updated_at": 1593672252678
-                    },
+                        },
                     "mode": {
                         "value": "on",
                         "updated_at": 1593672252677
-                    }
-                },
+                        }
+                    },
                 "reachability": {
                     "value": "offline",
                     "updated_at": 1593672252677
-                },
+                    },
 
-            }
-        ]
-    }
+                }
+            ]
+        }
 
     param_body_info_added = {
         "header": {
@@ -242,7 +256,7 @@ if __name__ == "__main__":
             "messageType": "DeviceAdded.command",
             "partnerId": "china_iot",
             "messageId": "20da6c8e-bc2f-11ea-87ff-f40f241e6280"
-        },
+            },
         "payload": [
             {
                 "deviceId": "2030835",
@@ -257,36 +271,36 @@ if __name__ == "__main__":
                     "firmwareVersions": {
                         "wifiModule": "123",
                         "mcu": "00000"
-                    }
-                },
+                        }
+                    },
                 "reachability": {
                     "value": "onlineceshi",
                     "updated_at": 1593672252675
-                },
+                    },
                 "properties": {
                     "2030835:temperature_controller.measured_temperature": {
                         "value": 26,
                         "updated_at": 1593672252675
-                    },
+                        },
                     "2030835:temperature_controller.mode": {
                         "value": "warm",
                         "updated_at": 1312312312
-                    },
+                        },
                     "2030835:temperature_controller.status": {
                         "value": "on",
                         "updated_at": 1312312999
+                        }
                     }
                 }
-            }
-        ]
-    }
+            ]
+        }
     param_body_info_added_v2 = {
         "header": {
             "protocolVersion": "0.0.1",
             "messageType": "DeviceAdded.command",
             "partnerId": "china_iot",
             "messageId": "20da6c8e-bc2f-11ea-87ff-f40f241e6280"
-        },
+            },
         "payload": [
             {
                 "deviceId": "2030835",
@@ -294,30 +308,30 @@ if __name__ == "__main__":
                     "measured_temperature": {
                         "value": 26,
                         "updated_at": 1593672252675
-                    },
+                        },
                     "mode": {
                         "value": "cold",
                         "updated_at": 1593672252677
-                    },
+                        },
                     "target_temperature": {
                         "value": 24,
                         "updated_at": 1593672252675
+                        },
                     },
-                },
                 "wind_controller": {
                     "wind_speed": {
                         "value": "high",
                         "updated_at": 1593672252678
-                    },
+                        },
                     "mode": {
                         "value": "on",
                         "updated_at": 1593672252677
-                    }
-                },
+                        }
+                    },
                 "reachability": {
                     "value": "online2",
                     "updated_at": 1593672252677
-                },
+                    },
                 "deviceInfo": {
                     "deviceName": "测试空调",
                     "tslId": "tsl-id-01-temp02",
@@ -329,13 +343,128 @@ if __name__ == "__main__":
                     "firmwareVersions": {
                         "wifiModule": "wifimodule1",
                         "mcu": "mcu1"
+                        }
+                    },
+                }
+            ]
+        }
+    device_info_added_v3 = {
+        "header": {
+            "protocolVersion": "0.0.1",
+            "messageType": "DeviceAdded.Event",
+            "partnerId": "china_iot",
+            "messageId": "20da6c8e-bc2f-11ea-87ff-f40f241e6280"
+            },
+        "payload": [
+            {
+                "deviceId": "2030835",
+                "reachability": {
+                    "deviceId": "2030835",
+                    "value": "online",
+                    "updated_at": 1593672252675
+                    },
+                "deviceInfo": {
+                    "deviceId": "2030835",
+                    "nickName": "11空调",
+                    "tslId": "tsl-id-01-temp02",
+                    "deviceType": "DEVICE-AC",
+                    "manufacturer": "TCL",
+                    "model": "AC",
+                    "mac": "38:76:CA:44:74:28",
+                    "serialNo": "8979798hiohy986289369",
+                    "firmwareVersions": {
+                        "wifiModule": "123",
+                        "mcu": "2331"
+                        },
+                    "tenantId": "TCL-2C",
+                    "protocol": "WiFi",
+                    "geolocation": {
+                        "longitude": 123.00,
+                        "latitude": 43.94
+                        },
+                    "location": {
+                        "room": "parent-bedroom",
+                        "floor": "1"
+                        },
+                    "deviceIcons": {
+                        "32dp": "233232.png",
+                        "64dp": "wewe.png"
+                        },
+                    "extra": {
+                        "SSID": "aaaaaa",
+                        "BT-name": "bbb"
+                        }
+                    },
+                "properties": {
+                    "deviceId": "2030835",
+                    "capabilities": {}
                     }
+                }
+            ]
+        }
+    param_body_user_added = {
+        "header": {
+            "protocolVersion": "0.0.1",
+            "messageType": "UserAdded.Event",
+            "partnerId": "china_iot",
+            "messageId": "20da6c8e-bc2f-11ea-87ff-f40f241e6280"
+            },
+        "payload": [
+            {
+                "userId": "2030844",
+                # "immutableIdentity": "tcl-sso:23222233",
+                "userName": "Ethan1",
+                "mobile": "13120575591",
+                "email": "yuyoung@613.com",
+                "login_details": [{
+                    "accountSystemId": "tcl-sso",
+                    "loginAccountId": "1234567"
+                    }],
+                "tenantId": "TCL",
                 },
-            }
-        ]
-    }
+            {
+                "userId": "2030845",
+                # "immutableIdentity": "tcl-sso:23222233",
+                "userName": "Ethan2",
+                "mobile": "13120575591",
+                "email": "yuyoung@613.com",
+                "login_details": [{
+                    "accountSystemId": "tcl-sso",
+                    "loginAccountId": "23222234"
+                    }],
+                "tenantId": "",
+                }
+            ]
+        }
 
-    dumps_param_body = json.dumps(param_body_info_added_v2)
+    param_body_user_deleted = {
+        "header": {
+            "protocolVersion": "0.0.1",
+            "messageType": "UserDeleted.event",
+            "partnerId": "china_iot",
+            "messageId": "20da6c8e-bc2f-11ea-87ff-f40f241e6280"
+            },
+        "payload": [
+            "2030838", "2030839"
+            ]
+        }
+    param_body_user_device_binding = {
+        "header": {
+            "protocolVersion": "0.0.1",
+            "messageType": "UserDeviceBinding.Event",
+            "partnerId": "china_iot",
+            "messageId": "20da6c8e-bc2f-11ea-87ff-f40f241e6280"
+            },
+        "payload": [
+            {
+                "deviceId": "2030838",
+                "userId": "2030837",
+                "userRole": "1"
+                }
+            ]
+        }
+
+    dumps_param_body = json.dumps(param_body_user_added)
 
     event = {
 
@@ -361,7 +490,7 @@ if __name__ == "__main__":
                 "cognitoAuthenticationProvider": "",
                 "sourceIp": "127.0.0.1",
                 "accountId": "",
-            },
+                },
             "stage": "prod",
             "authorizer": {
                 "accountId": "1155596075",
@@ -369,8 +498,8 @@ if __name__ == "__main__":
                 "accountSystemId": "sso",
                 "clientId": "iot-platform",
                 "expired": False
-            }
-        },
+                }
+            },
         "queryStringParameters": {"foo": "bar"},
         "headers": {
             "Via": "1.1 08f323deadbeefa7af34d5feb414ce27.cloudfront.net (CloudFront)",
@@ -391,13 +520,13 @@ if __name__ == "__main__":
             "User-Agent": "Custom User Agent String",
             "CloudFront-Forwarded-Proto": "https",
             "Accept-Encoding": "gzip, deflate, sdch",
-        },
+            },
         "pathParameters": {"proxy": "/examplepath"},
         "httpMethod": "POST",
         "stageVariables": {"baz": "qux"},
         "path": "/examplepath",
 
-    }
+        }
     context = '2'
 
     data = lambda_handler(event, context)

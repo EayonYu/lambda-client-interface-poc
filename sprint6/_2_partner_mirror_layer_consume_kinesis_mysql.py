@@ -7,6 +7,8 @@ description:
 """
 from __future__ import print_function
 
+import os
+
 import simplejson as json
 from boto3 import client as boto3_client
 
@@ -14,7 +16,9 @@ print('Loading function')
 
 lambda_client = boto3_client('lambda')
 
-# client_interface_stream_name = os.environ.get('CLI_STREAM_NAME')
+client_interface_stream_name = os.environ.get('CLI_STREAM_NAME')
+client_interface_stream_name = "debug4cli"
+
 client_interface_stream_name = "debug4cli"
 
 

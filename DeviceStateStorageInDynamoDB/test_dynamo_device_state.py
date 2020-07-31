@@ -75,7 +75,7 @@ def read_item(table, partner_id, partner_device_id):
         print('*** Exception', e)
         print(e.response['Error']['Message'])
     else:
-        # print_item(response['Item'])
+        print_item(response['Item'])
         return response['Item']
 
 
